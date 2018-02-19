@@ -3,9 +3,10 @@ const customWalker = require('./custom-walker');
 const fs = require('fs');
 const esprima = require('esprima');
 
-function findCssDefinitions(sourceCode) {
+function findCssPath(sourceCode) {
   const foundStylesDeclarations = {};
   const tree = esprima.parse(sourceCode, { jsx: true });
+  let foundCssPath = null;
 
   customWalker(tree, node => {
     const requiredPath = isRequire(node);
@@ -23,19 +24,18 @@ function findCssDefinitions(sourceCode) {
       throw new Error('Requiring styles not inside variable declarator');
     }
 
-    foundStylesDeclarations[node.parent.id.name] = requiredPath;
+    if (node.parent.id.name !== 'styles') {
+      console.log(node.parent);
+      throw new Error('Only styles name allowed for css');
+    }
 
-    return foundStylesDeclarations
+    foundCssPath = requiredPath;
   });
 
-  if (Object.keys(foundStylesDeclarations).length) {
-    return foundStylesDeclarations;
-  } else {
-    return null;
-  }
+  return foundCssPath;
 }
 
 const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
-console.log(findCssDefinitions(sourceCode));
+console.log(findCssPath(sourceCode));
 
-module.exports = findCssDefinitions;
+module.exports = findCssPath;
