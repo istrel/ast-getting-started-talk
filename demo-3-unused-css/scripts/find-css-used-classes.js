@@ -7,7 +7,7 @@ const esprima = require('esprima');
 function findCssUsedClasses(sourceCode) {
   const cssPath = findCssPath(sourceCode);
   if (!cssPath) {
-    return null;
+    return { found: false };
   }
 
   const foundStylesDeclarations = {};
@@ -33,10 +33,10 @@ function findCssUsedClasses(sourceCode) {
     }
   });
 
-  return usedClasses;
+  return { found: true, usedClasses, cssPath };
 }
 
-const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
-console.log(findCssUsedClasses(sourceCode));
+// const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
+// console.log(findCssUsedClasses(sourceCode));
 
 module.exports = findCssUsedClasses;
