@@ -48,6 +48,7 @@
     "build": "node react-scripts/build.js"
   },
   "devDependencies": {
+    "css-tree": "^1.0.0-alpha.28",
     "esprima": "^4.0.0"
   },
   "jest": {
