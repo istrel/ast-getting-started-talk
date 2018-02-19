@@ -58,7 +58,7 @@ function findExportedProps(sourceCode) {
   return result;
 }
 
-const sourceCode = fs.readFileSync(__dirname + '/../src/utils.js', 'utf-8');
-console.log(findExportedProps(sourceCode));
+// const sourceCode = fs.readFileSync(__dirname + '/../src/utils.js', 'utf-8');
+// console.log(findExportedProps(sourceCode));
 
 module.exports = findExportedProps;

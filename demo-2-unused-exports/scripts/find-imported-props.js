@@ -33,6 +33,11 @@ function findImportedProps(sourceCode) {
 
     // Добавлено относительно unreachable-files.js
     if (!node.parent || node.parent.type !== 'MemberExpression') {
+      // Сохраняем старый require, чтобы дважды не проходить по дереву
+      result.push({
+        filename: arg.value,
+        propName: null
+      });
       return;
     }
 
@@ -53,7 +58,7 @@ function findImportedProps(sourceCode) {
   return result;
 }
 
-const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
-console.log(findImportedProps(sourceCode));
+// const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
+// console.log(findImportedProps(sourceCode));
 
 module.exports = findImportedProps;
