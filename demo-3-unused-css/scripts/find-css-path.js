@@ -35,7 +35,7 @@ function findCssPath(sourceCode) {
   return foundCssPath;
 }
 
-const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
-console.log(findCssPath(sourceCode));
+// const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
+// console.log(findCssPath(sourceCode));
 
 module.exports = findCssPath;

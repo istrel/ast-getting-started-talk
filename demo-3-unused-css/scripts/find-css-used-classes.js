@@ -1,40 +1,42 @@
-const esprima = require('esrpima');
+const isRequire = require('./is-require');
 const customWalker = require('./custom-walker');
+const findCssPath = require('./find-css-path');
+const fs = require('fs');
+const esprima = require('esprima');
 
 function findCssUsedClasses(sourceCode) {
+  const cssPath = findCssPath(sourceCode);
+  if (!cssPath) {
+    return null;
+  }
 
-}
+  const foundStylesDeclarations = {};
+  const tree = esprima.parse(sourceCode, { jsx: true });
+  const usedClasses = {};
 
-const cssImportName = foundCssImports[cssFilePath];
-const usedClasses = {};
-
-walk(jsAst.ast, node => {
-  if (node.type === 'Identifier' && node.name === cssImportName) {
-    const parent = node.parent;
-
-    if (parent.type === 'ImportDefaultSpecifier') {
+  customWalker(tree, node => {
+    if (node.type !== 'MemberExpression') {
       return;
     }
 
-    if (parent.type !== 'MemberExpression') {
-      throw new Error('Not member');
+    if (node.object.type !== 'Identifier' || node.object.name !== 'styles') {
+      return;
     }
 
-    const property = parent.property;
-
-    // styles['hello']
-    if (parent.computed) {
-      if (property.type !== 'Literal') {
-        throw new Error('Not literal');
-      }
-
-      usedClasses[property.value] = true;
+    if (node.property.type === 'Identifier') {
+      usedClasses[node.property.name] = true;
+    } else if (node.property.type === 'Literal') {
+      usedClasses[node.property.value] = true;
     } else {
-      if (property.type !== 'Identifier') {
-        throw new Error('Unexpected identifier');
-      }
-
-      usedClasses[property.name] = true;
+      console.log(node);
+      throw new Error('Unexpected usage of styles object');
     }
-  }
-});
+  });
+
+  return usedClasses;
+}
+
+const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
+console.log(findCssUsedClasses(sourceCode));
+
+module.exports = findCssUsedClasses;
