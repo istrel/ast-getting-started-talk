@@ -2,6 +2,7 @@ const esprima = require('esprima');
 const fs = require('fs');
 
 function findNodes(sourceCode) {
+  const result = [];
   esprima.parse(sourceCode, { jsx: true }, function (node) {
     if (node.type !== 'CallExpression') {
       return;
@@ -27,9 +28,13 @@ function findNodes(sourceCode) {
       throw new Error("Expected string literal - not found");
     }
 
-    console.log(arg.value);
+    result.push(arg.value);
   });
+
+  return result;
 }
 
 // const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
-// findNodes(sourceCode);
+// console.log(findNodes(sourceCode));
+
+module.exports = findNodes;
