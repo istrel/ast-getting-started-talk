@@ -3,7 +3,7 @@ const customWalker = require('./custom-walker');
 const findRequiredCSSPaths = require('./find-required-css-paths');
 const fs = require('fs');
 const esprima = require('esprima');
-
+const escope = require('escope');
 
 function findCssUsedClasses(sourceCode) {
   const declToPath = findRequiredCSSPaths(sourceCode);
@@ -11,8 +11,13 @@ function findCssUsedClasses(sourceCode) {
   const tree = esprima.parse(sourceCode, { jsx: true });
 
   const scopeManager = escope.analyze(tree, { ecmaVersion: 6 });
-  const globalScope = scopeManager.acquire(tree);
-  const [moduleScope] = globalScope.childScopes;
+
+  // CommonJS case
+  const moduleScope = scopeManager.acquire(tree);
+
+  // ES6 modules Case
+  // const globalScope = scopeManager.acquire(tree);
+  // const [moduleScope] = globalScope.childScopes;
 
   const declToClassToUsed = {};
 

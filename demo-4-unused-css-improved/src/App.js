@@ -3,6 +3,10 @@ const Header = require('./Header');
 const leftPad = require('./utils').leftPad;
 const styles = require('./App.css');
 
+function pseudo(styles) {
+  console.log(styles['pseudo-used']);
+}
+
 class App extends React.Component {
   render() {
     return (
