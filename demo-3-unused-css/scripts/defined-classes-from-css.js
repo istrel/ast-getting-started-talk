@@ -1,5 +1,4 @@
 const csstree = require('css-tree');
-const fs = require('fs');
 
 function definedClasses(cssSource) {
   const foundClassNames = {};

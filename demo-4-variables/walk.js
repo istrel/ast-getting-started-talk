@@ -26,12 +26,4 @@ function walkNode(node, callback) {
   }
 }
 
-function startWalkNode(node, callback) {
-  node.fnScope = Object.create(null);
-  node.blockScope = Object.create(null);
-  node.parent = null;
-
-  walkNode(node, callback);
-}
-
-module.exports = startWalkNode;
+module.exports = walkNode;

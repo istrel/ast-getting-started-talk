@@ -1,20 +1,28 @@
-const findCssUsedClasses = require('./find-css-used-classes');
+const usedClassesFromJS = require('./used-classes-from-js');
 const fs = require('fs');
 const path = require('path');
 const child_process = require('child_process')
 
 const globalUsedClasses = {};
 
-function collectCssInfo(filepath) {
+function gatherUsedCSSClasses(filepath) {
   const sourceCode = fs.readFileSync(filepath, 'utf-8');
-  const { found, usedClasses, cssPath } = findCssUsedClasses(sourceCode);
+  const dirname = path.dirname(filepath);
+  const {declToClassToUsed, declToPath} = usedClassesFromJS(sourceCode);
 
-  if (!found) {
-    return;
+  for (const declName in declToPath) {
+    const cssPath = path.resolve(dirname, declToPath[declName]);
+    globalUsedClasses[cssPath] = globalUsedClasses[cssPath] || {};
+    const usedClasses = declToClassToUsed[declName];
+
+    for (const usedClassName in usedClasses) {
+      globalUsedClasses[cssPath][usedClassName] = true;
+    }
   }
+}
 
-  globalUsedClasses[cssPath] = globalUsedClasses[cssPath] || {};
-  Object.assign(globalUsedClasses[cssPath], usedClasses);
+function gatherDefinedCSSClasses(filepath) {
+
 }
 
 // Cперва собираем статистику по использованным классам
@@ -26,7 +34,7 @@ child_process.execSync('git ls-files')
   })
   .map(function (relative) { return path.resolve(relative); })
   .forEach(function (path) {
-    collectCssInfo(path);
+    gatherUsedCSSClasses(path);
   });
 
 // Потом собираем статистику по объявленным классам

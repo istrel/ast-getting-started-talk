@@ -1,12 +1,10 @@
 const isRequire = require('./is-require');
 const customWalker = require('./custom-walker');
-const fs = require('fs');
 const esprima = require('esprima');
 
-function findCssPath(sourceCode) {
-  const foundStylesDeclarations = {};
+function findRequiredCSSPaths(sourceCode) {
+  const nameToPathMap = {};
   const tree = esprima.parse(sourceCode, { jsx: true });
-  let foundCssPath = null;
 
   customWalker(tree, node => {
     const requiredPath = isRequire(node);
@@ -29,13 +27,10 @@ function findCssPath(sourceCode) {
       throw new Error('Only styles name allowed for css');
     }
 
-    foundCssPath = requiredPath;
+    nameToPathMap[node.parent.id.name] = requiredPath;
   });
 
-  return foundCssPath;
+  return nameToPathMap;
 }
 
-// const sourceCode = fs.readFileSync(__dirname + '/../src/App.js', 'utf-8');
-// console.log(findCssPath(sourceCode));
-
-module.exports = findCssPath;
+module.exports = findRequiredCSSPaths;

@@ -7,7 +7,12 @@ import React from 'react';
 import logo from './logo.svg';
 import styles from './App.css';
 
+function hello(styles) {
+  styles.forEach(console.log.bind(console));
+}
+
 module.exports = function () {
+  console.log(styles.hello);
   return (
     <header className={styles['App-header']}>
       <img src={logo} className={styles['App-logo']} alt="logo" />
@@ -17,15 +22,17 @@ module.exports = function () {
 };
 `;
 
-const ast = esprima.parseScript(source, { loc: true, jsx: true });
-const scopeManager = escope.analyze(ast);
+const ast = esprima.parseModule(source, { loc: true, jsx: true });
+const scopeManager = escope.analyze(ast, {ecmaVersion: 6, sourceType: 'module'});
+
+const importedNames = {};
 
 walk(ast, node => {
   if (node.type !== 'ImportDeclaration') {
     return;
   }
 
-  if (node.source.value !== 'string') {
+  if (typeof node.source.value !== 'string') {
     throw new Error('Import path not string')
   }
 
@@ -41,9 +48,40 @@ walk(ast, node => {
     throw new Error('Expected default import from css');
   }
 
-  console.log(node.specifiers[0].local.name);
-  // const scope = scopeManager.acquire(node);
-  // if (scope) {
-  //   console.log(scope.variables.map(v => v.references))
-  // }
+  importedNames[node.specifiers[0].local.name] = {};
 })
+
+const globalScope = scopeManager.acquire(ast);
+const [moduleScope] = globalScope.childScopes;
+
+moduleScope.variables.forEach(v => {
+  if (importedNames[v.name]) {
+    const { references } = v;
+
+    references.forEach(ref => {
+      const identifierParent = ref.identifier.parent;
+
+      if (identifierParent.type !== 'MemberExpression' || identifierParent.object !== ref.identifier) {
+        console.log(identifierParent);
+        console.log(ref.identifier);
+        throw new Error('Not expected usage');
+      }
+
+      const memberExp = identifierParent;
+
+      if (memberExp.computed) {
+        if (memberExp.property.type === 'Literal') {
+          importedNames[v.name][memberExp.property.value] = true;
+        } else {
+          console.log(memberExp.property);
+          console.log('*');
+          importedNames[v.name]['*'] = true;
+        }
+      } else {
+        importedNames[v.name][memberExp.property.name] = true;
+      }
+    });
+  }
+})
+
+console.log(importedNames);
