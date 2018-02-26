@@ -94,7 +94,7 @@ function wrap(node, parent) {
     });
   }
 
-  function parseExpression(node) {
+  function markAsExpression(node) {
     if (node.type === Syntax.Identifier) {
       node.expressionIdentifier = true;
     }
@@ -163,10 +163,11 @@ function wrap(node, parent) {
   // Единственная задача этих блоков - пометить идентификатор-выражение там, где оно есть
   switch (node.type) {
     case Syntax.ExpressionStatement:
-      parseExpression(node.expression);
+    case Syntax.AwaitExpression:
+      markAsExpression(node.expression);
       break;
     case Syntax.WithStatement:
-      parseExpression(node.object);
+      markAsExpression(node.object);
       break;
     case Syntax.ReturnStatement:
     case Syntax.ThrowStatement:
@@ -174,95 +175,93 @@ function wrap(node, parent) {
     case Syntax.UpdateExpression:
     case Syntax.SpreadElement:
     case Syntax.YieldExpression:
-      parseExpression(node.argument);
+      markAsExpression(node.argument);
       break;
     case Syntax.IfStatement:
     case Syntax.WhileStatement:
     case Syntax.DoWhileStatement:
     case Syntax.SwitchCase:
-      parseExpression(node.test);
+      markAsExpression(node.test);
       break;
     case Syntax.SwitchStatement:
-      parseExpression(node.discriminant);
+      markAsExpression(node.discriminant);
       break;
     case Syntax.ForStatement:
-      parseExpression(node.init);
-      parseExpression(node.test);
-      parseExpression(node.update);
+      markAsExpression(node.init);
+      markAsExpression(node.test);
+      markAsExpression(node.update);
       break;
     case Syntax.ForInStatement:
-      parseExpression(node.right);
+      markAsExpression(node.right);
       break;
     case Syntax.VariableDeclarator:
-      parseExpression(node.init);
+      markAsExpression(node.init);
       break;
     case Syntax.Property:
       if (node.computed) {
-        parseExpression(node.key);
+        markAsExpression(node.key);
       }
-      parseExpression(node.value);
+      markAsExpression(node.value);
       break;
     case Syntax.BinaryExpression:
     case Syntax.LogicalExpression:
-      parseExpression(node.left);
-      parseExpression(node.right);
+      markAsExpression(node.left);
+      markAsExpression(node.right);
       break;
     case Syntax.AssignmentExpression:
-      // parseExpression(node.left); - no anymore in es2015
-      parseExpression(node.right);
+      // markAsExpression(node.left); - no anymore in es2015
+      markAsExpression(node.right);
       break;
     case Syntax.MemberExpression:
-      parseExpression(node.object);
-      parseExpression(node.property);
+      markAsExpression(node.object);
+      markAsExpression(node.property);
       break;
     case Syntax.ConditionalExpression:
-      parseExpression(node.test);
-      parseExpression(node.alternate);
-      parseExpression(node.consequent);
+      markAsExpression(node.test);
+      markAsExpression(node.alternate);
+      markAsExpression(node.consequent);
       break;
     case Syntax.CallExpression:
-      parseExpression(node.callee);
-      break;
     case Syntax.NewExpression:
-      parseExpression(node.callee);
-      node.arguments.forEach(parseExpression);
+      markAsExpression(node.callee);
+      node.arguments.forEach(markAsExpression);
       break;
     case Syntax.ArrayExpression:
       node.elements.forEach(expressionOrNull => {
         if (expressionOrNull !== null) {
-          parseExpression(expressionOrNull);
+          markAsExpression(expressionOrNull);
         }
       });
       break;
     case Syntax.CallExpression:
-      node.arguments.forEach(parseExpression);
+      node.arguments.forEach(markAsExpression);
       break;
     case Syntax.SequenceExpression:
     case Syntax.TemplateLiteral:
-      node.expressions.forEach(parseExpression);
+      node.expressions.forEach(markAsExpression);
       break;
     case Syntax.ArrowFunctionExpression:
-      parseExpression(node.body);
+      markAsExpression(node.body);
       break;
     case Syntax.TaggedTemplateExpression:
-      parseExpression(node.tag);
+      markAsExpression(node.tag);
       break;
     case Syntax.AssignmentPattern:
-      parseExpression(node.right);
+      markAsExpression(node.right);
       break;
     case Syntax.ClassDeclaration:
     case Syntax.ClassExpression:
-      parseExpression(node.superClass);
+      markAsExpression(node.superClass);
       break;
     case Syntax.MethodDefinition:
       if (node.computed) {
-        parseExpression(node.key);
+        markAsExpression(node.key);
       }
     case Syntax.ExportDefaultDeclaration:
-      parseExpression(node.declaration);
+      markAsExpression(node.declaration);
       break;
     case Syntax.ExportSpecifier:
-      parseExpression(node.exported);
+      markAsExpression(node.exported);
       break;
   }
 

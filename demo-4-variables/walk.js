@@ -16,9 +16,11 @@ function walkNode(node, callback) {
 
     if (Array.isArray(potentialChildNode)) {
       potentialChildNode.forEach(function (potentialDescendantNode) {
+        potentialDescendantNode.parent = node;
         walkNode(potentialDescendantNode, callback);
       });
-    } else if (typeof potentialChildNode === 'object') {
+    } else if (typeof potentialChildNode === 'object' && potentialChildNode) {
+      potentialChildNode.parent = node;
       walkNode(potentialChildNode, callback);
     }
   }
