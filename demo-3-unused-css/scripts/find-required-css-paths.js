@@ -22,11 +22,6 @@ function findRequiredCSSPaths(sourceCode) {
       throw new Error('Requiring styles not inside variable declarator');
     }
 
-    if (node.parent.id.name !== 'styles') {
-      console.log(node.parent);
-      throw new Error('Only styles name allowed for css');
-    }
-
     nameToPathMap[node.parent.id.name] = requiredPath;
   });
 
