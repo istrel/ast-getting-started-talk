@@ -19,12 +19,12 @@ function walkNode(node, callback) {
     if (Array.isArray(potentialChildNode)) {
       // Если это массив нод - вызываем итератор для каждого ребенка, передав туда parent
       potentialChildNode.forEach(function (potentialDescendantNode) {
-        potentialDescendantNode.parent = node;
+        Object.defineProperty(potentialDescendantNode, 'parent', { value: node, enumerable: false });
         walkNode(potentialDescendantNode, callback);
       });
     } else if (typeof potentialChildNode === 'object' && potentialChildNode) {
       // Если же это объект (предположительно - нода) - вызываем итератор для самого объекта
-      potentialChildNode.parent = node;
+      Object.defineProperty(potentialChildNode, 'parent', { value: node, enumerable: false });
       walkNode(potentialChildNode, callback);
     }
   }

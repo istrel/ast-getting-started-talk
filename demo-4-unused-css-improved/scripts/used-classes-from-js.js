@@ -10,6 +10,9 @@ function findCssUsedClasses(sourceCode) {
   const foundStylesDeclarations = {};
   const tree = esprima.parse(sourceCode, { jsx: true });
 
+  // Кастомный итератор добавляет ссылки parent, поэтому проходимся им
+  customWalker(tree, () => null);
+
   const scopeManager = escope.analyze(tree, { ecmaVersion: 6 });
 
   // CommonJS case
@@ -20,6 +23,9 @@ function findCssUsedClasses(sourceCode) {
   // const [moduleScope] = globalScope.childScopes;
 
   const declToClassToUsed = {};
+  for (const declName in declToPath) {
+    declToClassToUsed[declName] = {};
+  }
 
   moduleScope.variables.forEach(v => {
     if (declToClassToUsed[v.name]) {
@@ -28,7 +34,15 @@ function findCssUsedClasses(sourceCode) {
       references.forEach(ref => {
         const identifierParent = ref.identifier.parent;
 
-        if (identifierParent.type !== 'MemberExpression' || identifierParent.object !== ref.identifier) {
+        const isInsideConst = identifierParent.type === 'VariableDeclarator' && identifierParent.id === ref.identifier;
+
+        if (isInsideConst) {
+          return;
+        }
+
+        const isInsideMember = identifierParent.type === 'MemberExpression' && identifierParent.object === ref.identifier;
+
+        if (!isInsideMember) {
           console.log(identifierParent);
           console.log(ref.identifier);
           throw new Error('Not expected usage');
