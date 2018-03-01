@@ -49,7 +49,7 @@ child_process.execSync('git ls-files')
   .toString()
   .split('\n')
   .filter(function (file) {
-    return file.match(/\.js$/);
+    return file.match(/^src/) && file.match(/\.js$/);
   })
   .map(function (relative) { return path.resolve(relative); })
   .filter(Boolean)

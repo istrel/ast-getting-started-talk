@@ -1,0 +1,28 @@
+{
+  "name": "ast-getting-started-talk",
+  "version": "0.0.1",
+  "description": "Demos for 'AST getting started' talk",
+  "main": "index.js",
+  "dependencies": {
+    "babel-eslint": "7.2.3",
+    "css-tree": "^1.0.0-alpha.28",
+    "escope": "^3.6.0",
+    "esprima": "^4.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "demo1": "cd demo-1-unreachable-files && node scripts/main.js",
+    "demo2": "cd demo-2-unused-css && node scripts/main.js",
+    "demo3": "cd demo-3-unused-css-improved && node scripts/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/istrel/ast-getting-started-talk.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/istrel/ast-getting-started-talk/issues"
+  },
+  "homepage": "https://github.com/istrel/ast-getting-started-talk#readme"
+}
